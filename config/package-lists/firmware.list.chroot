@@ -1,0 +1,4 @@
+# Server NIC firmware; tailor to your fleet after testing.
+firmware-bnx2
+firmware-bnx2x
+firmware-misc-nonfree

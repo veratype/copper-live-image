@@ -1,0 +1,8 @@
+[Unit]
+Description=Generate fresh SSH host keys in the live overlay
+Before=ssh.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/ssh-keygen -A
+RemainAfterExit=yes

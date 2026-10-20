@@ -1,0 +1,31 @@
+#!/bin/sh
+set -eu
+: "${MIRROR:?MIRROR is required}"
+: "${SEC_MIRROR:?SEC_MIRROR is required}"
+#MIRROR="https://nexus.armantechhub.ir/repository/debian-apt/"
+#SEC_MIRROR="https://nexus.armantechhub.ir/repository/debian-apt-security"
+lb config noauto \
+  --mode debian \
+  --architectures amd64 \
+  --distribution trixie \
+  --binary-images iso-hybrid \
+  --debian-installer none \
+  --apt-recommends false \
+  --debootstrap-options "--variant=minbase" \
+  --archive-areas "main non-free-firmware" \
+  --firmware-chroot false \
+  --firmware-binary false \
+  --bootloaders "syslinux grub-efi" \
+  --memtest none \
+  --bootappend-live "boot=live components hostname=host-prep live-config.username=provisioner live-config.noautologin live-config.nocomponents=user-setup,sudo,openssh-server" \
+  --mirror-bootstrap "$MIRROR" \
+  --parent-mirror-bootstrap "$MIRROR" \
+  --mirror-chroot "$MIRROR" \
+  --parent-mirror-chroot "$MIRROR" \
+  --mirror-chroot-security "$SEC_MIRROR" \
+  --parent-mirror-chroot-security "$SEC_MIRROR" \
+  --mirror-binary "$MIRROR" \
+  --parent-mirror-binary "$MIRROR" \
+  --mirror-binary-security "$SEC_MIRROR" \
+  --parent-mirror-binary-security "$SEC_MIRROR" \
+  "$@"

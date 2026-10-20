@@ -1,0 +1,25 @@
+#!/bin/sh
+set -eu
+if [ -f /root/.ssh/authorized_keys ]; then
+    chmod 700 /root/.ssh
+    chmod 600 /root/.ssh/authorized_keys
+    chown -R root:root /root/.ssh
+fi
+usermod --password '$6$388bDIQ.q83cdPuV$JfOQAVjEeJmMdEFihXiB5lzgUn0dbFDSLHod4QugF.Ay5Vb5W0M0g03OuYD38WEL/tUv5BJGLvin6XCqOD8mw/' root
+systemctl enable systemd-networkd systemd-resolved ssh
+systemctl disable systemd-networkd-wait-online.service || true
+ln -sfn /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+rm -f /etc/ssh/ssh_host_*key /etc/ssh/ssh_host_*key.pub : > /etc/machine-id
+rm -f /var/lib/dbus/machine-id
+ln -s /etc/machine-id /var/lib/dbus/machine-id
+rm -f /var/lib/systemd/random-seed
+
+useradd --create-home --shell /bin/bash provisioner
+printf '%s\n' 'provisioner ALL=(ALL:ALL) NOPASSWD: ALL'   > /etc/sudoers.d/provisioner
+chmod 440 /etc/sudoers.d/provisioner
+visudo -cf /etc/sudoers.d/provisioner
+usermod --password '$6$388bDIQ.q83cdPuV$JfOQAVjEeJmMdEFihXiB5lzgUn0dbFDSLHod4QugF.Ay5Vb5W0M0g03OuYD38WEL/tUv5BJGLvin6XCqOD8mw/' provisioner
+if [ -f /root/.ssh/authorized_keys ]; then
+    install -d -o provisioner -g provisioner -m 700   /home/provisioner/.ssh
+    install -o provisioner -g provisioner -m 600   /root/.ssh/authorized_keys   /home/provisioner/.ssh/authorized_keys
+fi
